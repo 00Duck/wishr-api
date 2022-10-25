@@ -1,12 +1,10 @@
-package wishr
+package main
 
 import (
 	"net/http"
-
-	wishr "github.com/00Duck/wishr-api"
 )
 
-func (env *wishr.Env) authenticateUser() http.HandlerFunc {
+func AuthenticateUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// use thing
 	}

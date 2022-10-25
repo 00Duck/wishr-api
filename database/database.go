@@ -1,4 +1,4 @@
-package wishr
+package database
 
 import (
 	"log"
@@ -8,7 +8,11 @@ import (
 	"gorm.io/gorm"
 )
 
-func Connect(env *Env) {
+type DB struct {
+	db *gorm.DB
+}
+
+func (d *DB) Connect() {
 	conn_str := os.Getenv("DB_USER") + ":" + os.Getenv("DB_PASSWORD")
 	conn_db := os.Getenv("DB_DATABASE")
 	conn_port, ok := os.LookupEnv("DB_PORT")
@@ -16,7 +20,7 @@ func Connect(env *Env) {
 		conn_port = "3306"
 	}
 	var err error
-	env.db, err = gorm.Open(mysql.New(mysql.Config{
+	d.db, err = gorm.Open(mysql.New(mysql.Config{
 		DSN:                       conn_str + "@tcp(127.0.0.1:" + conn_port + ")/" + conn_db + "?charset=utf8&parseTime=True&loc=Local", // data source name
 		DefaultStringSize:         256,                                                                                                  // default size for string fields
 		DisableDatetimePrecision:  true,                                                                                                 // disable datetime precision, which not supported before MySQL 5.6

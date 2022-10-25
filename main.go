@@ -1,4 +1,4 @@
-package wishr
+package main
 
 import (
 	"context"
@@ -8,25 +8,12 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/gorilla/mux"
-	"gorm.io/gorm"
+	"github.com/00Duck/wishr-api/app"
 )
 
-type Env struct {
-	db     *gorm.DB
-	router *mux.Router
-}
-
-var env = &Env{
-	router: mux.NewRouter(),
-}
-
-func init() {
-	Connect(env)
-}
-
 func main() {
-	env.routes()
+	env := app.New()
+	env.DB.Connect()
 
 	port := "9191"
 	svr := &http.Server{
@@ -34,7 +21,7 @@ func main() {
 		WriteTimeout: time.Second * 30,
 		ReadTimeout:  time.Second * 30,
 		IdleTimeout:  time.Second * 120,
-		Handler:      env.router,
+		Handler:      env.Router,
 	}
 
 	go func() {
