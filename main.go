@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -13,7 +12,6 @@ import (
 
 func main() {
 	env := app.New()
-	env.DB.Connect()
 
 	port := "9191"
 	svr := &http.Server{
@@ -25,10 +23,10 @@ func main() {
 	}
 
 	go func() {
-		log.Print("Starting API on port " + port)
+		env.Log.Printf("Starting API on port " + port)
 		err := svr.ListenAndServe()
 		if err != nil {
-			log.Fatal(err)
+			env.Log.Fatal(err)
 		}
 	}()
 

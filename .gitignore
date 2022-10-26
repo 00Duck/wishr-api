@@ -14,4 +14,8 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
+# Ignore binary
 wishr-api
+
+# Used to pass env variables and build server
+start.sh

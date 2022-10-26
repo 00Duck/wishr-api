@@ -1,5 +1,9 @@
 package database
 
-func (d *DB) authenticate() {
-	print("hello world")
+import (
+	"github.com/00Duck/wishr-api/models"
+)
+
+func (d *DB) Authenticate(auth *models.AuthenticateModel) string {
+	return "Received " + auth.User + " Pass: " + auth.Password
 }
