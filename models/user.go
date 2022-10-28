@@ -17,6 +17,9 @@ type User struct {
 
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 	uid, err := uuid.NewRandom()
+	if err != nil {
+		return err
+	}
 	u.ID = strings.Replace(uid.String(), "-", "", -1)
-	return err
+	return nil
 }

@@ -19,11 +19,11 @@ func main() {
 	d := &database.DB{}
 	d.Connect()
 
-	migrateUser(d)
+	migrate(d)
 	log.Println("Finished AutoMigration")
 }
 
-func migrateUser(d *database.DB) error {
-	err := d.AutoMigrate(&models.User{})
+func migrate(d *database.DB) error {
+	err := d.AutoMigrate(&models.User{}, &models.Wishlist{}, &models.WishlistItem{})
 	return err
 }

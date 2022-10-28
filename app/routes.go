@@ -10,4 +10,10 @@ func (env *Env) routes() {
 	protected.HandleFunc("/user", env.HandleUserCreate()).Methods("POST")
 	protected.HandleFunc("/user", env.HandleUserUpdate()).Methods("PATCH")
 	protected.HandleFunc("/user/{id}", env.HandleUserDelete()).Methods("DELETE")
+
+	protected.HandleFunc("/wishlist", env.HandleWishlistRetrieveAll()).Methods("GET")
+	protected.HandleFunc("/wishlist/{id}", env.HandleWishlistRetrieveOne()).Methods("GET")
+	protected.HandleFunc("/wishlist", env.HandleWishlistCreate()).Methods("POST")
+	protected.HandleFunc("/wishlist", env.HandleWishlistUpdate()).Methods("PATCH")
+	protected.HandleFunc("/wishlist/{id}", env.HandleWishlistDelete()).Methods("DELETE")
 }
