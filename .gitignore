@@ -17,5 +17,5 @@
 # Ignore binary
 wishr-api
 
-# Used to pass env variables and build server
-start.sh
+# Ignore personal environment vars
+.env

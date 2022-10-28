@@ -8,8 +8,8 @@ import (
 )
 
 type ResponseModel struct {
-	Message string      `json:"message"`
-	Data    interface{} `json:"data"`
+	Message string
+	Data    interface{}
 }
 
 // EncodeJSON encodes JSON into a write response. Fails with reply to client containing error code
