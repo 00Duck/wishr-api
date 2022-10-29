@@ -1,6 +1,6 @@
 package models
 
-type AuthenticateModel struct {
-	User     string
+type LoginModel struct {
+	UserName string
 	Password string
 }

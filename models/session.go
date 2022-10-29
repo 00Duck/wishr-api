@@ -1,25 +1,23 @@
 package models
 
 import (
-	"strings"
-
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
-type User struct {
+type Session struct {
 	gorm.Model
 	ID       string `gorm:"primaryKey"`
-	UserName string `gorm:"uniqueIndex"`
+	UserName string
+	UserID   string
 	FullName string
-	Password string
 }
 
-func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
+func (s *Session) BeforeCreate(tx *gorm.DB) (err error) {
 	uid, err := uuid.NewRandom()
 	if err != nil {
 		return err
 	}
-	u.ID = strings.Replace(uid.String(), "-", "", -1)
+	s.ID = uid.String()
 	return nil
 }
