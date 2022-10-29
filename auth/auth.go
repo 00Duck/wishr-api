@@ -35,7 +35,7 @@ func NewContext(ctx context.Context, session *models.Session) context.Context {
 	return context.WithValue(ctx, SessionKey, session)
 }
 
-// FromContext returns the value stored in the SessionKey, should be jwt.MapClaims
+// FromContext returns the value stored in the SessionKey
 func FromContext(ctx context.Context) *models.Session {
 	return ctx.Value(SessionKey).(*models.Session)
 }
