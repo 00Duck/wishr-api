@@ -10,6 +10,7 @@ import (
 
 	"github.com/00Duck/wishr-api/app"
 	"github.com/joho/godotenv"
+	"github.com/rs/cors"
 )
 
 func init() {
@@ -22,13 +23,18 @@ func init() {
 func main() {
 	env := app.New()
 
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:9001"},
+		AllowCredentials: true,
+	})
+
 	port := "9191"
 	svr := &http.Server{
 		Addr:         "127.0.0.1:" + port,
 		WriteTimeout: time.Second * 30,
 		ReadTimeout:  time.Second * 30,
 		IdleTimeout:  time.Second * 120,
-		Handler:      env.Router,
+		Handler:      c.Handler(env.Router),
 	}
 
 	go func() {
@@ -39,16 +45,15 @@ func main() {
 		}
 	}()
 
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-	signal.Notify(c, os.Kill)
+	channel := make(chan os.Signal, 1)
+	signal.Notify(channel, os.Interrupt)
+	signal.Notify(channel, os.Kill)
 
 	// block until we receive a kill or interrupt
-	<-c
+	<-channel
 
 	//when the signal is caught, gracefully shutdown the server
 	//Allows a timeout for processes to complete if any are in progress
 	_, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
-	//db.Disconnect(ctx)
 }

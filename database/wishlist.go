@@ -2,15 +2,12 @@ package database
 
 import (
 	"errors"
-	"fmt"
-	"log"
 	"strconv"
 
 	"github.com/00Duck/wishr-api/models"
 )
 
 func (d *DB) WishlistCreate(wishlist *models.Wishlist) (string, error) {
-	log.Print(fmt.Sprint(wishlist))
 	res := d.db.Create(&wishlist)
 	return wishlist.ID, res.Error
 }
