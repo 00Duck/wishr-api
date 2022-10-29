@@ -7,6 +7,7 @@ func (env *Env) routes() {
 	unprotected.HandleFunc("/register", env.RegisterUser()).Methods("POST")
 
 	protected := env.Router.PathPrefix("/api/prot").Subrouter()
+	protected.Use(env.ValidateSessionMiddleware)
 	protected.HandleFunc("/user", env.HandleUserRetrieveAll()).Methods("GET")
 	protected.HandleFunc("/user/{id}", env.HandleUserRetrieveOne()).Methods("GET")
 	protected.HandleFunc("/user", env.HandleUserCreate()).Methods("POST")

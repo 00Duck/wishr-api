@@ -1,6 +1,7 @@
 package app
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
@@ -79,4 +80,27 @@ func (env *Env) RegisterUser() http.HandlerFunc {
 		}
 		env.encodeResponse(w, &ResponseModel{Message: "success"})
 	}
+}
+
+// ValidateSessionMiddleware checks the token in the session cookie to ensure user is authenticated
+func (env *Env) ValidateSessionMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		sessionCookie, err := r.Cookie(auth.SessionCookieName)
+		if err != nil {
+			env.Log.Println("Error retrieving cookie for validation: " + err.Error())
+			errResponse(w, env.Log, 401, errors.New("No cookie found"))
+			return
+		}
+		session, err := env.db.CheckSession(sessionCookie.Value)
+		if err != nil {
+			env.Log.Println("Error on CheckSession: " + err.Error())
+			errResponse(w, env.Log, 401, errors.New("You are not logged in"))
+			return
+		}
+		//add the session information to the request context
+		r = r.WithContext(auth.NewContext(r.Context(), session))
+
+		next.ServeHTTP(w, r)
+		return
+	})
 }

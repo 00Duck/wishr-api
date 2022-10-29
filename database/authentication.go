@@ -77,3 +77,12 @@ func (d *DB) Register(user *models.User) error {
 	}
 	return nil
 }
+
+func (d *DB) CheckSession(sessionIDValue string) (*models.Session, error) {
+	session := &models.Session{}
+	res := d.db.Where(&models.Session{ID: sessionIDValue}).First(&session)
+	if res.Error != nil {
+		return nil, res.Error
+	}
+	return session, nil
+}
