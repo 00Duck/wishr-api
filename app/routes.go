@@ -8,6 +8,7 @@ func (env *Env) routes() {
 
 	protected := env.Router.PathPrefix("/api/prot").Subrouter()
 	protected.Use(env.ValidateSessionMiddleware)
+	protected.HandleFunc("/validate", env.ValidationCheck()).Methods("GET")
 	protected.HandleFunc("/user", env.HandleUserRetrieveAll()).Methods("GET")
 	protected.HandleFunc("/user/{id}", env.HandleUserRetrieveOne()).Methods("GET")
 	protected.HandleFunc("/user", env.HandleUserCreate()).Methods("POST")

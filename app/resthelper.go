@@ -14,7 +14,7 @@ type ResponseModel struct {
 
 // EncodeJSON encodes JSON into a write response. Fails with reply to client containing error code
 func (env *Env) encodeResponse(w http.ResponseWriter, data interface{}) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Add("Content-Type", "application/json")
 	err := json.NewEncoder(w).Encode(data)
 	if err != nil {
 		errResponse(w, env.Log, 500, err)

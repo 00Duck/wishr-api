@@ -2,7 +2,6 @@ package database
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/00Duck/wishr-api/auth"
 	"github.com/00Duck/wishr-api/models"
@@ -11,22 +10,20 @@ import (
 
 func (d *DB) Authenticate(login *models.LoginModel) (*models.Session, error) {
 	ERR_BAD_PW := errors.New("Username or Password is incorrect")
-	ERR_STH_BAD := errors.New("Something went wrong logging you in. Please contact your administrator for help.")
+	ERR_STH_BAD := errors.New("Something went wrong attempting to log you in. Please contact your administrator for help.")
 	if login.UserName == "" || login.Password == "" {
 		return nil, ERR_BAD_PW
 	}
 	user := &models.User{}
 	res := d.db.Where(&models.User{UserName: login.UserName}).First(&user)
-	if res.Error != nil {
+	if res.Error != nil && res.Error != gorm.ErrRecordNotFound {
 		return nil, res.Error
 	}
 	if res.RowsAffected != 1 {
-		fmt.Println("rows affect wasn't 1")
 		return nil, ERR_BAD_PW
 	}
 	ok := auth.CheckPasswordHash(login.Password, user.Password)
 	if !ok {
-		fmt.Println("pw hash failed: " + login.Password + " " + user.Password)
 		return nil, ERR_BAD_PW
 	}
 	session := &models.Session{}

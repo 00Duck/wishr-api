@@ -21,15 +21,16 @@ func (env *Env) LoginUser() http.HandlerFunc {
 			return
 		}
 		sessionCookie := &http.Cookie{
-			Name:  auth.SessionCookieName,
-			Value: session.ID,
-			// Note that core_session has TTL turned on - the session data will automatically be deleted from the database
-			// once it gets stale. MaxAge should match time to live to prevent unexpected logouts.
-			MaxAge:   60 * 60 * 24 * 14, // days
-			Secure:   false,
+			Name:   auth.SessionCookieName,
+			Value:  session.ID,
+			MaxAge: 60 * 60 * 24 * 7, // days
+			// Expires:  time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
+			Secure:   true,
 			HttpOnly: true,
+			SameSite: http.SameSiteNoneMode,
 			Path:     "/",
 		}
+
 		http.SetCookie(w, sessionCookie)
 		env.encodeResponse(w, &ResponseModel{Message: "success"})
 	}
@@ -38,15 +39,6 @@ func (env *Env) LoginUser() http.HandlerFunc {
 // LogOutUser send a trash cookie over token to force the user out of the system
 func (env *Env) LogOutUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		logoutCookie := &http.Cookie{
-			Name:     auth.SessionCookieName,
-			Value:    "",
-			MaxAge:   -1,
-			Expires:  time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC),
-			Secure:   false,
-			HttpOnly: true,
-			Path:     "/",
-		}
 
 		sessionCookie, err := r.Cookie(auth.SessionCookieName)
 		if err != nil {
@@ -62,7 +54,7 @@ func (env *Env) LogOutUser() http.HandlerFunc {
 			return
 		}
 
-		http.SetCookie(w, logoutCookie)
+		SendLogoutCookie(w)
 		env.encodeResponse(w, &ResponseModel{Message: "You have been logged out."})
 	}
 }
@@ -94,6 +86,7 @@ func (env *Env) ValidateSessionMiddleware(next http.Handler) http.Handler {
 		session, err := env.db.CheckSession(sessionCookie.Value)
 		if err != nil {
 			env.Log.Println("Error on CheckSession: " + err.Error())
+			SendLogoutCookie(w)
 			errResponse(w, env.Log, 401, errors.New("You are not logged in"))
 			return
 		}
@@ -103,4 +96,24 @@ func (env *Env) ValidateSessionMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 		return
 	})
+}
+
+// protected with middlware. Returns 200, but middleware will catch if there's a problem.
+func (env *Env) ValidationCheck() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		env.encodeResponse(w, &ResponseModel{})
+	}
+}
+
+func SendLogoutCookie(w http.ResponseWriter) {
+	logoutCookie := &http.Cookie{
+		Name:     auth.SessionCookieName,
+		Value:    "",
+		MaxAge:   -1,
+		Expires:  time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC),
+		Secure:   true,
+		HttpOnly: true,
+		Path:     "/",
+	}
+	http.SetCookie(w, logoutCookie)
 }
