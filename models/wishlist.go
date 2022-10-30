@@ -10,13 +10,13 @@ import (
 
 type Wishlist struct {
 	gorm.Model
-	ID          string `gorm:"primaryKey"`
-	Name        string
-	Description string
-	Items       []WishlistItem `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;foreignKey:Wishlist;"`
-	ItemCount   int
-	Owner       string
-	CreatedAt   time.Time `gorm:"<-:create"` // allow read and create
+	ID         string `gorm:"primaryKey"`
+	Name       string
+	Items      []WishlistItem `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;foreignKey:Wishlist;"`
+	ItemCount  int
+	Owner      string
+	CreatedAt  time.Time `gorm:"<-:create"` // allow read and create
+	SharedWith []*User   `gorm:"many2many:wishlist_share;"`
 }
 
 type WishlistItem struct {

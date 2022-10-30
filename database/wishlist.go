@@ -7,28 +7,14 @@ import (
 	"github.com/00Duck/wishr-api/models"
 )
 
-func (d *DB) WishlistCreate(wishlist *models.Wishlist) (string, error) {
-	res := d.db.Create(&wishlist)
-	return wishlist.ID, res.Error
-}
-
-func (d *DB) WishlistUpdate(wishlist *models.Wishlist) error {
-	//Find wishlist and error if it doesn't exist
-	res := d.db.First(&models.Wishlist{}, "id = ?", wishlist.ID)
+func (d *DB) WishlistUpsert(wishlist *models.Wishlist) (string, error) {
+	res := d.db.Where("Wishlist = ?", wishlist.ID).Delete(&models.WishlistItem{})
 	if res.Error != nil {
-		return res.Error
-	}
-	if res.RowsAffected == 0 {
-		return errors.New("No record found to update")
-	}
-	//delete all associated items
-	res = d.db.Where("Wishlist = ?", wishlist.ID).Delete(&models.WishlistItem{})
-	if res.Error != nil {
-		return res.Error
+		return "", res.Error
 	}
 	//new items on wishlist is the new list
 	res = d.db.Save(&wishlist)
-	return res.Error
+	return wishlist.ID, res.Error
 }
 
 func (d *DB) WishlistRetrieveOne(id string) (*models.Wishlist, error) {
@@ -40,9 +26,9 @@ func (d *DB) WishlistRetrieveOne(id string) (*models.Wishlist, error) {
 	return wishlist, res.Error
 }
 
-func (d *DB) WishlistRetrieveAll() ([]models.Wishlist, error) {
+func (d *DB) WishlistRetrieveAll(session *models.Session) ([]models.Wishlist, error) {
 	wishlists := []models.Wishlist{}
-	res := d.db.Find(&wishlists)
+	res := d.db.Where(&models.Wishlist{Owner: session.UserID}).Find(&wishlists)
 	return wishlists, res.Error
 }
 
@@ -52,4 +38,10 @@ func (d *DB) WishlistDelete(id string) (string, error) {
 		return "", errors.New("No record found to delete")
 	}
 	return strconv.FormatInt(res.RowsAffected, 10) + " rows deleted", res.Error
+}
+
+func (d *DB) GetSharedWishlists(session *models.Session) ([]models.Wishlist, error) {
+	wishlists := []models.Wishlist{}
+	err := d.db.Model(&models.User{}).Where(&models.User{ID: session.UserID}).Association("SharedWishlists").Find(&wishlists)
+	return wishlists, err
 }

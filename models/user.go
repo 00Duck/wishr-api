@@ -9,10 +9,11 @@ import (
 
 type User struct {
 	gorm.Model
-	ID       string `gorm:"primaryKey"`
-	UserName string `gorm:"uniqueIndex"`
-	FullName string
-	Password string
+	ID              string `gorm:"primaryKey"`
+	UserName        string `gorm:"uniqueIndex"`
+	FullName        string
+	Password        string
+	SharedWishlists []*Wishlist `gorm:"many2many:wishlist_share;"`
 }
 
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
