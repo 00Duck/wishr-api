@@ -40,3 +40,9 @@ func (d *DB) UserDelete(id string) (string, error) {
 	}
 	return strconv.FormatInt(res.RowsAffected, 10) + " rows deleted", res.Error
 }
+
+func (d *DB) GetUsersForWishlist(wishlistID string) ([]models.User, error) {
+	users := []models.User{}
+	err := d.db.Model(&models.Wishlist{}).Where(&models.Wishlist{ID: wishlistID}).Association("SharedWishlists").Find(&users)
+	return users, err
+}

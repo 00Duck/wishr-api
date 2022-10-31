@@ -64,12 +64,25 @@ func (env *Env) HandleUserUpdate() http.HandlerFunc {
 func (env *Env) HandleUserDelete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		params := mux.Vars(r)
-		user_id := params["id"]
-		msg, err := env.db.UserDelete(user_id)
+		userId := params["id"]
+		msg, err := env.db.UserDelete(userId)
 		if err != nil {
 			env.encodeResponse(w, &ResponseModel{Message: "Error: " + err.Error(), Data: nil})
 			return
 		}
 		env.encodeResponse(w, &ResponseModel{Message: "success", Data: msg})
+	}
+}
+
+func (env *Env) HandleGetSharedUsersForWishlist() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		params := mux.Vars(r)
+		wishlistID := params["wishlist"]
+		users, err := env.db.GetUsersForWishlist(wishlistID)
+		if err != nil {
+			env.encodeResponse(w, &ResponseModel{Message: "Error: " + err.Error(), Data: users})
+			return
+		}
+		env.encodeResponse(w, &ResponseModel{Message: "success", Data: users})
 	}
 }

@@ -14,11 +14,11 @@ func (env *Env) routes() {
 	protected.HandleFunc("/user", env.HandleUserCreate()).Methods("POST")
 	protected.HandleFunc("/user", env.HandleUserUpdate()).Methods("PATCH")
 	protected.HandleFunc("/user/{id}", env.HandleUserDelete()).Methods("DELETE")
+	protected.HandleFunc("/user/shared/{wishlist}", env.HandleGetSharedUsersForWishlist()).Methods("GET")
 
 	protected.HandleFunc("/wishlist/shared", env.HandleWishlistRetrieveShared()).Methods("GET")
 	protected.HandleFunc("/wishlist", env.HandleWishlistRetrieveAll()).Methods("GET")
 	protected.HandleFunc("/wishlist/{id}", env.HandleWishlistRetrieveOne()).Methods("GET")
 	protected.HandleFunc("/wishlist", env.HandleWishlistUpsert()).Methods("POST")
 	protected.HandleFunc("/wishlist/{id}", env.HandleWishlistDelete()).Methods("DELETE")
-
 }
