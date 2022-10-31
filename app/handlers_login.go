@@ -3,6 +3,8 @@ package app
 import (
 	"errors"
 	"net/http"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/00Duck/wishr-api/auth"
@@ -63,6 +65,21 @@ func (env *Env) RegisterUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user := models.User{}
 		if ok := env.decodeRequest(w, r, &user); !ok {
+			return
+		}
+		regEnabled := strings.ToUpper(os.Getenv("REGISTRATION_ENABLED"))
+		if regEnabled != "TRUE" {
+			env.encodeResponse(w, &ResponseModel{Message: "Registration is currently disabled."})
+			return
+		}
+		regCode := os.Getenv("REGISTRATION_CODE")
+		if regCode == "" && regEnabled == "TRUE" {
+			env.Log.Println("Please set environment variable REGISTRATION_CODE to allow registration of intended users.")
+			env.encodeResponse(w, &ResponseModel{Message: "Registration is currently disabled."})
+			return
+		}
+		if regCode != user.RegistrationCode {
+			env.encodeResponse(w, &ResponseModel{Message: "Registration code is invalid."})
 			return
 		}
 		err := env.db.Register(&user)

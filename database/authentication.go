@@ -2,6 +2,7 @@ package database
 
 import (
 	"errors"
+	"log"
 
 	"github.com/00Duck/wishr-api/auth"
 	"github.com/00Duck/wishr-api/models"
@@ -32,9 +33,11 @@ func (d *DB) Authenticate(login *models.LoginModel) (*models.Session, error) {
 	session.FullName = user.FullName
 	res = d.db.Create(&session)
 	if res.Error != nil {
+		log.Println(res.Error.Error())
 		return nil, ERR_STH_BAD
 	}
 	if res.RowsAffected != 1 {
+		log.Println(res.Error.Error())
 		return nil, ERR_STH_BAD
 	}
 	return session, nil
@@ -58,7 +61,7 @@ func (d *DB) Register(user *models.User) error {
 		return errors.New("There was a problem attempting to register: " + res.Error.Error())
 	}
 	if res.RowsAffected == 1 {
-		return errors.New("The Username you have chosen is already in use")
+		return errors.New("The name you have chosen is already in use")
 	}
 	pw, err := auth.HashPassword(user.Password)
 	if err != nil {
