@@ -34,8 +34,14 @@ func (env *Env) HandleLoginUser() http.HandlerFunc {
 			Path:     "/",
 		}
 
+		profile := &models.ProfileUser{
+			ID:       session.UserID,
+			UserName: session.UserName,
+			FullName: session.FullName,
+		}
+
 		http.SetCookie(w, sessionCookie)
-		env.encodeResponse(w, &ResponseModel{Message: "success"})
+		env.encodeResponse(w, &ResponseModel{Message: "success", Data: profile})
 	}
 }
 
@@ -133,6 +139,7 @@ func SendLogoutCookie(w http.ResponseWriter) {
 		Expires:  time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC),
 		Secure:   true,
 		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
 		Path:     "/",
 	}
 	http.SetCookie(w, logoutCookie)

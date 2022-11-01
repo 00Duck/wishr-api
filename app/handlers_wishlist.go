@@ -82,3 +82,37 @@ func (env *Env) HandleWishlistDelete() http.HandlerFunc {
 		env.encodeResponse(w, &ResponseModel{Message: "success", Data: msg})
 	}
 }
+
+// HandleWishlistItemReserve reserves a Wishlist Item
+func (env *Env) HandleWishlistItemReserve() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		wlItem := models.WishlistItem{}
+		if ok := env.decodeRequest(w, r, &wlItem); !ok {
+			return
+		}
+		session := auth.FromContext(r.Context())
+		err := env.db.ReserveWishlistItem(session, &wlItem)
+		if err != nil {
+			env.encodeResponse(w, &ResponseModel{Message: "Error: " + err.Error(), Data: nil})
+			return
+		}
+		env.encodeResponse(w, &ResponseModel{Message: "success", Data: nil})
+	}
+}
+
+// HandleWishlistItemReserve reserves a Wishlist Item
+func (env *Env) HandleWishlistItemUnreserve() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		wlItem := models.WishlistItem{}
+		if ok := env.decodeRequest(w, r, &wlItem); !ok {
+			return
+		}
+		session := auth.FromContext(r.Context())
+		err := env.db.UnreserveWishlistItem(session, &wlItem)
+		if err != nil {
+			env.encodeResponse(w, &ResponseModel{Message: "Error: " + err.Error(), Data: nil})
+			return
+		}
+		env.encodeResponse(w, &ResponseModel{Message: "success", Data: nil})
+	}
+}

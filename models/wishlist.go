@@ -10,28 +10,28 @@ import (
 
 type Wishlist struct {
 	gorm.Model
-	ID                 string `gorm:"primaryKey"`
-	Name               string
-	Items              []WishlistItem `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;foreignKey:Wishlist;"`
-	ItemCount          int
-	Owner              string
-	OwnerFullName      string
-	ReservedBy         string
-	ReservedByFullName string
-	CreatedAt          time.Time `gorm:"<-:create"` // allow read and create
-	SharedWith         []*User   `gorm:"many2many:wishlist_share;"`
-	IsOwner            bool      `gorm:"-"` //handled in app layer
+	ID            string `gorm:"primaryKey"`
+	Name          string
+	Items         []WishlistItem `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;foreignKey:Wishlist;"`
+	ItemCount     int
+	Owner         string
+	OwnerFullName string
+	CreatedAt     time.Time `gorm:"<-:create"` // allow read and create
+	SharedWith    []*User   `gorm:"many2many:wishlist_share;"`
+	IsOwner       bool      `gorm:"-"` //handled in app layer
 }
 
 type WishlistItem struct {
-	ID           uint `gorm:"primaryKey;autoIncrement;"`
-	Wishlist     string
-	Name         string
-	URL          string
-	Notes        string
-	Price        string
-	PersonalItem bool
-	Quantity     int
+	ID                 uint `gorm:"primaryKey;autoIncrement;"`
+	Wishlist           string
+	Name               string
+	URL                string
+	Notes              string
+	Price              string
+	PersonalItem       bool
+	Quantity           int
+	ReservedBy         string
+	ReservedByFullName string
 }
 
 func (u *Wishlist) BeforeCreate(tx *gorm.DB) (err error) {

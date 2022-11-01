@@ -79,3 +79,12 @@ func (d *DB) SetUsersForWishlist(wishlistID string, users []models.User) error {
 	}).Model(&models.Wishlist{ID: wishlistID}).Association("SharedWith").Replace(&users)
 	return err
 }
+
+func (d *DB) RetrieveProfile(session *models.Session) (*models.ProfileUser, error) {
+	user := &models.ProfileUser{}
+	res := d.db.Model(&models.User{}).First(&user, "id = ?", session.UserID)
+	if res.RowsAffected == 0 {
+		return nil, errors.New("No record found")
+	}
+	return user, res.Error
+}

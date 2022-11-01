@@ -126,3 +126,16 @@ func (env *Env) HandleSetSharedUsersForWishlist() http.HandlerFunc {
 		env.encodeResponse(w, &ResponseModel{Message: "success", Data: nil})
 	}
 }
+
+// Gets the users profile
+func (env *Env) HandleRetrieveProfile() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		session := auth.FromContext(r.Context())
+		user, err := env.db.RetrieveProfile(session)
+		if err != nil {
+			env.encodeResponse(w, &ResponseModel{Message: "Error: " + err.Error(), Data: user})
+			return
+		}
+		env.encodeResponse(w, &ResponseModel{Message: "success", Data: user})
+	}
+}

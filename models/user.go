@@ -23,6 +23,12 @@ type SearchUser struct {
 	FullName string
 }
 
+type ProfileUser struct {
+	ID       string
+	UserName string
+	FullName string
+}
+
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 	uid, err := uuid.NewRandom()
 	if err != nil {

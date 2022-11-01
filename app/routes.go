@@ -18,9 +18,15 @@ func (env *Env) routes() {
 	protected.HandleFunc("/user/shared/{wishlist}", env.HandleGetSharedUsersForWishlist()).Methods("GET")
 	protected.HandleFunc("/user/shared/{wishlist}", env.HandleSetSharedUsersForWishlist()).Methods("POST")
 
+	protected.HandleFunc("/profile", env.HandleRetrieveProfile()).Methods("GET")
+
 	protected.HandleFunc("/wishlist/shared", env.HandleWishlistRetrieveShared()).Methods("GET")
 	protected.HandleFunc("/wishlist", env.HandleWishlistRetrieveAll()).Methods("GET")
 	protected.HandleFunc("/wishlist/{id}", env.HandleWishlistRetrieveOne()).Methods("GET")
 	protected.HandleFunc("/wishlist", env.HandleWishlistUpsert()).Methods("POST")
 	protected.HandleFunc("/wishlist/{id}", env.HandleWishlistDelete()).Methods("DELETE")
+
+	protected.HandleFunc("/wishlist_item/reserve", env.HandleWishlistItemReserve()).Methods("POST")
+	protected.HandleFunc("/wishlist_item/unreserve", env.HandleWishlistItemUnreserve()).Methods("POST")
+
 }

@@ -71,6 +71,30 @@ func (d *DB) GetSharedWishlists(session *models.Session) ([]models.Wishlist, err
 	return wishlists, err
 }
 
+func (d *DB) ReserveWishlistItem(session *models.Session, wlItem *models.WishlistItem) error {
+	testWlItem := &models.WishlistItem{}
+	err := d.db.Find(&testWlItem, "id = ?", wlItem.ID).Error
+	if err != nil {
+		return err
+	}
+	if testWlItem.ReservedBy != "" {
+		return errors.New("Item has already been reserved by someone else")
+	}
+	res := d.db.Find(&wlItem).Updates(&models.WishlistItem{ReservedBy: session.UserID, ReservedByFullName: session.FullName})
+	if res.RowsAffected == 0 {
+		return errors.New("No record found to update")
+	}
+	return res.Error
+}
+
+func (d *DB) UnreserveWishlistItem(session *models.Session, wlItem *models.WishlistItem) error {
+	res := d.db.Model(&wlItem).Select("reserved_by", "reserved_by_full_name").Updates(&models.WishlistItem{ReservedBy: "", ReservedByFullName: ""})
+	if res.RowsAffected == 0 {
+		return errors.New("No record found to update")
+	}
+	return res.Error
+}
+
 func (d *DB) getUserFullName(userID string) string {
 	if userID == "" {
 		return ""
