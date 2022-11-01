@@ -11,7 +11,8 @@ import (
 	"github.com/00Duck/wishr-api/models"
 )
 
-func (env *Env) LoginUser() http.HandlerFunc {
+// HandleLoginUser authenticates user
+func (env *Env) HandleLoginUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		login := models.LoginModel{}
 		if ok := env.decodeRequest(w, r, &login); !ok {
@@ -39,7 +40,7 @@ func (env *Env) LoginUser() http.HandlerFunc {
 }
 
 // LogOutUser send a trash cookie over token to force the user out of the system
-func (env *Env) LogOutUser() http.HandlerFunc {
+func (env *Env) HandleLogOutUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		sessionCookie, err := r.Cookie(auth.SessionCookieName)
@@ -61,7 +62,8 @@ func (env *Env) LogOutUser() http.HandlerFunc {
 	}
 }
 
-func (env *Env) RegisterUser() http.HandlerFunc {
+// HandleRegisterUser handles self service user creation
+func (env *Env) HandleRegisterUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user := models.User{}
 		if ok := env.decodeRequest(w, r, &user); !ok {
@@ -115,13 +117,14 @@ func (env *Env) ValidateSessionMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-// protected with middlware. Returns 200, but middleware will catch if there's a problem.
+// ValidationCheck protected endpoint with middlware. Returns 200, but middleware will catch if there's a problem.
 func (env *Env) ValidationCheck() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		env.encodeResponse(w, &ResponseModel{})
 	}
 }
 
+// SendLogoutCookie separated out since used in multiple places
 func SendLogoutCookie(w http.ResponseWriter) {
 	logoutCookie := &http.Cookie{
 		Name:     auth.SessionCookieName,

@@ -17,18 +17,34 @@ func (d *DB) WishlistUpsert(wishlist *models.Wishlist) (string, error) {
 	return wishlist.ID, res.Error
 }
 
-func (d *DB) WishlistRetrieveOne(id string) (*models.Wishlist, error) {
+func (d *DB) WishlistRetrieveOne(session *models.Session, id string) (*models.Wishlist, error) {
 	wishlist := &models.Wishlist{}
 	res := d.db.Model(&models.Wishlist{}).Preload("Items").Find(wishlist, "id = ?", id)
 	if res.RowsAffected == 0 {
 		return nil, errors.New("No record found")
 	}
-	return wishlist, res.Error
+	wishlist.CanEdit = session.UserID == wishlist.Owner
+	if wishlist.CanEdit {
+		return wishlist, res.Error
+	}
+	//If the list is no longer shared with this user, don't return it
+	sharedUsers := []models.User{}
+	err := d.db.Model(&models.Wishlist{ID: id}).Association("SharedWith").Find(&sharedUsers, &models.User{ID: session.UserID})
+	if err != nil {
+		return nil, err
+	}
+	if len(sharedUsers) == 0 {
+		return nil, errors.New("no record found")
+	}
+	return wishlist, nil
 }
 
 func (d *DB) WishlistRetrieveAll(session *models.Session) ([]models.Wishlist, error) {
 	wishlists := []models.Wishlist{}
 	res := d.db.Where(&models.Wishlist{Owner: session.UserID}).Find(&wishlists)
+	for _, wl := range wishlists {
+		wl.CanEdit = true
+	}
 	return wishlists, res.Error
 }
 
@@ -42,6 +58,11 @@ func (d *DB) WishlistDelete(id string) (string, error) {
 
 func (d *DB) GetSharedWishlists(session *models.Session) ([]models.Wishlist, error) {
 	wishlists := []models.Wishlist{}
-	err := d.db.Model(&models.User{}).Where(&models.User{ID: session.UserID}).Association("SharedWishlists").Find(&wishlists)
+	err := d.db.Model(&models.User{ID: session.UserID}).Association("SharedWishlists").Find(&wishlists)
+
+	// Disable sharing and editing since these are shared lists
+	for _, wl := range wishlists {
+		wl.CanEdit = false
+	}
 	return wishlists, err
 }

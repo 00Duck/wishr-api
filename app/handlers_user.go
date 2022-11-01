@@ -3,10 +3,12 @@ package app
 import (
 	"net/http"
 
+	"github.com/00Duck/wishr-api/auth"
 	"github.com/00Duck/wishr-api/models"
 	"github.com/gorilla/mux"
 )
 
+// Not currently in use
 func (env *Env) HandleUserCreate() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user := models.User{}
@@ -22,6 +24,7 @@ func (env *Env) HandleUserCreate() http.HandlerFunc {
 	}
 }
 
+// Not currently in use
 func (env *Env) HandleUserRetrieveAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		users, err := env.db.UserRetrieveAll()
@@ -33,6 +36,7 @@ func (env *Env) HandleUserRetrieveAll() http.HandlerFunc {
 	}
 }
 
+// Not currently in use
 func (env *Env) HandleUserRetrieveOne() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		params := mux.Vars(r)
@@ -46,6 +50,7 @@ func (env *Env) HandleUserRetrieveOne() http.HandlerFunc {
 	}
 }
 
+// Not currently in use
 func (env *Env) HandleUserUpdate() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user := models.User{}
@@ -61,6 +66,7 @@ func (env *Env) HandleUserUpdate() http.HandlerFunc {
 	}
 }
 
+// Not currently in use
 func (env *Env) HandleUserDelete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		params := mux.Vars(r)
@@ -74,6 +80,7 @@ func (env *Env) HandleUserDelete() http.HandlerFunc {
 	}
 }
 
+// Returns the already shared users for a wishlist
 func (env *Env) HandleGetSharedUsersForWishlist() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		params := mux.Vars(r)
@@ -84,5 +91,38 @@ func (env *Env) HandleGetSharedUsersForWishlist() http.HandlerFunc {
 			return
 		}
 		env.encodeResponse(w, &ResponseModel{Message: "success", Data: users})
+	}
+}
+
+// Returns a list of all selectable users for the given wishlist (all users minus already shared minus the requestor)
+func (env *Env) HandleGetSelectableShareUserList() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		params := mux.Vars(r)
+		wishlistID := params["wishlist"]
+		session := auth.FromContext(r.Context())
+		users, err := env.db.GetSelectableUsersToShareList(session, wishlistID)
+		if err != nil {
+			env.encodeResponse(w, &ResponseModel{Message: "Error: " + err.Error(), Data: users})
+			return
+		}
+		env.encodeResponse(w, &ResponseModel{Message: "success", Data: users})
+	}
+}
+
+// Sets the list of users that a wishlist gets shared to
+func (env *Env) HandleSetSharedUsersForWishlist() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		params := mux.Vars(r)
+		wishlistID := params["wishlist"]
+		users := []models.User{}
+		if ok := env.decodeRequest(w, r, &users); !ok {
+			return
+		}
+		err := env.db.SetUsersForWishlist(wishlistID, users)
+		if err != nil {
+			env.encodeResponse(w, &ResponseModel{Message: "Error: " + err.Error(), Data: nil})
+			return
+		}
+		env.encodeResponse(w, &ResponseModel{Message: "success", Data: nil})
 	}
 }

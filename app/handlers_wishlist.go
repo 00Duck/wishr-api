@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// Handles both the creation and edit/update of wishlists
 func (env *Env) HandleWishlistUpsert() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		wishlist := models.Wishlist{}
@@ -27,6 +28,7 @@ func (env *Env) HandleWishlistUpsert() http.HandlerFunc {
 	}
 }
 
+// Retrieves all wishlists for the given session user
 func (env *Env) HandleWishlistRetrieveAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		session := auth.FromContext(r.Context())
@@ -39,6 +41,7 @@ func (env *Env) HandleWishlistRetrieveAll() http.HandlerFunc {
 	}
 }
 
+// Retrieves all shared wishlists for the given session user
 func (env *Env) HandleWishlistRetrieveShared() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		session := auth.FromContext(r.Context())
@@ -51,11 +54,13 @@ func (env *Env) HandleWishlistRetrieveShared() http.HandlerFunc {
 	}
 }
 
+// Retrieves a wishlist. Used for both shared and owned wishlists
 func (env *Env) HandleWishlistRetrieveOne() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		params := mux.Vars(r)
 		wishlist_id := params["id"]
-		wishlist, err := env.db.WishlistRetrieveOne(wishlist_id)
+		session := auth.FromContext(r.Context())
+		wishlist, err := env.db.WishlistRetrieveOne(session, wishlist_id)
 		if err != nil {
 			env.encodeResponse(w, &ResponseModel{Message: "Error: " + err.Error(), Data: nil})
 			return
@@ -64,6 +69,7 @@ func (env *Env) HandleWishlistRetrieveOne() http.HandlerFunc {
 	}
 }
 
+// Deletes a wishlist
 func (env *Env) HandleWishlistDelete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		params := mux.Vars(r)
