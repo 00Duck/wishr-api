@@ -23,8 +23,9 @@ func (d *DB) WishlistRetrieveOne(session *models.Session, id string) (*models.Wi
 	if res.RowsAffected == 0 {
 		return nil, errors.New("No record found")
 	}
-	wishlist.CanEdit = session.UserID == wishlist.Owner
-	if wishlist.CanEdit {
+	wishlist.IsOwner = session.UserID == wishlist.Owner
+	wishlist.OwnerFullName = d.getUserFullName(wishlist.Owner)
+	if wishlist.IsOwner {
 		return wishlist, res.Error
 	}
 	//If the list is no longer shared with this user, don't return it
@@ -42,8 +43,10 @@ func (d *DB) WishlistRetrieveOne(session *models.Session, id string) (*models.Wi
 func (d *DB) WishlistRetrieveAll(session *models.Session) ([]models.Wishlist, error) {
 	wishlists := []models.Wishlist{}
 	res := d.db.Where(&models.Wishlist{Owner: session.UserID}).Find(&wishlists)
-	for _, wl := range wishlists {
-		wl.CanEdit = true
+
+	for i := 0; i < len(wishlists); i++ {
+		wishlists[i].IsOwner = true
+		wishlists[i].OwnerFullName = session.FullName
 	}
 	return wishlists, res.Error
 }
@@ -61,8 +64,21 @@ func (d *DB) GetSharedWishlists(session *models.Session) ([]models.Wishlist, err
 	err := d.db.Model(&models.User{ID: session.UserID}).Association("SharedWishlists").Find(&wishlists)
 
 	// Disable sharing and editing since these are shared lists
-	for _, wl := range wishlists {
-		wl.CanEdit = false
+	for i := 0; i < len(wishlists); i++ {
+		wishlists[i].IsOwner = false
+		wishlists[i].OwnerFullName = d.getUserFullName(wishlists[i].Owner)
 	}
 	return wishlists, err
+}
+
+func (d *DB) getUserFullName(userID string) string {
+	if userID == "" {
+		return ""
+	}
+	user := &models.User{ID: userID}
+	err := d.db.First(&user).Error
+	if err != nil {
+		return ""
+	}
+	return user.FullName
 }
