@@ -4,4 +4,4 @@ docker run -d \
 --name wishr-api \
 --env-file .env \
 --network wishr-net \
-wishr-api:1.0
+00duck/wishr-api:1.0.0
