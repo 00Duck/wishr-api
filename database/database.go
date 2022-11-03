@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/00Duck/wishr-api/models"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -42,6 +43,10 @@ func (d *DB) Connect() {
 		log.Fatal("Failed to connect to database: " + err.Error())
 	}
 	log.Print("Connected to database")
+	err = d.AutoMigrate(&models.User{}, &models.Wishlist{}, &models.WishlistItem{}, &models.Session{})
+	if err != nil {
+		log.Fatal("Failed to AutoMigrate database.")
+	}
 }
 
 func (d *DB) AutoMigrate(model ...interface{}) error {

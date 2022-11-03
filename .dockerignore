@@ -1,0 +1,12 @@
+# don't pass envs, this is passed at run-time
+.env
+
+# commands meant to be run manually
+*.sh
+
+# docker file
+Dockerfile
+
+# the binary
+wishr-api
+
