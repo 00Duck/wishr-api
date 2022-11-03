@@ -25,8 +25,8 @@ type WishlistItem struct {
 	ID                 uint `gorm:"primaryKey;autoIncrement;"`
 	Wishlist           string
 	Name               string
-	URL                string
-	Notes              string
+	URL                string `gorm:"size:4000"`
+	Notes              string `gorm:"size:4000"`
 	Price              string
 	PersonalItem       bool
 	Quantity           int
