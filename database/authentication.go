@@ -10,7 +10,7 @@ import (
 )
 
 func (d *DB) Authenticate(login *models.LoginModel) (*models.Session, error) {
-	ERR_BAD_PW := errors.New("Username or Password is incorrect")
+	ERR_BAD_PW := errors.New("User Name or Password is incorrect")
 	ERR_STH_BAD := errors.New("Something went wrong attempting to log you in. Please contact your administrator for help.")
 	if login.UserName == "" || login.Password == "" {
 		return nil, ERR_BAD_PW

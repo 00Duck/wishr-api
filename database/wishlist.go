@@ -35,7 +35,7 @@ func (d *DB) WishlistRetrieveOne(session *models.Session, id string) (*models.Wi
 		return nil, err
 	}
 	if len(sharedUsers) == 0 {
-		return nil, errors.New("no record found")
+		return nil, errors.New("No record found")
 	}
 	return wishlist, nil
 }
@@ -52,7 +52,7 @@ func (d *DB) WishlistRetrieveAll(session *models.Session) ([]models.Wishlist, er
 }
 
 func (d *DB) WishlistDelete(id string) (string, error) {
-	res := d.db.Select("WishlistItem").Delete(&models.Wishlist{ID: id})
+	res := d.db.Unscoped().Select("Items").Delete(&models.Wishlist{ID: id})
 	if res.RowsAffected == 0 {
 		return "", errors.New("No record found to delete")
 	}

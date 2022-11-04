@@ -1,5 +1,5 @@
 #!/bin/sh
-docker run -d -p 32306:3306 \
+docker run -d -p 3306:3306 \
 -e MYSQL_DATABASE=wishr \
 -e MYSQL_USER=wishr \
 -e MYSQL_PASSWORD=wishr \
