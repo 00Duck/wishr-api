@@ -26,7 +26,7 @@ func (env *Env) HandleLoginUser() http.HandlerFunc {
 		sessionCookie := &http.Cookie{
 			Name:   auth.SessionCookieName,
 			Value:  session.ID,
-			MaxAge: 60 * 60 * 24 * 7, // days
+			MaxAge: 60 * 60 * 24 * 30, // days
 			// Expires:  time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
 			Secure:   true,
 			HttpOnly: true,

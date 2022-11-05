@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/00Duck/wishr-api/models"
 	"gorm.io/driver/mysql"
@@ -42,14 +43,28 @@ func (d *DB) Connect() {
 	if err != nil {
 		log.Fatal("Failed to connect to database: " + err.Error())
 	}
-	log.Print("Connected to database")
+	log.Println("Connected to database")
 	err = d.AutoMigrate(&models.User{}, &models.Wishlist{}, &models.WishlistItem{}, &models.Session{})
 	if err != nil {
 		log.Fatal("Failed to AutoMigrate database.")
 	}
+
+	go d.scheduleDeleteOldSessions()
 }
 
 func (d *DB) AutoMigrate(model ...interface{}) error {
 	err := d.db.AutoMigrate(model...)
 	return err
+}
+
+func (d *DB) scheduleDeleteOldSessions() {
+	for {
+		time.Sleep(time.Minute * 15)
+		daysAgo := time.Now().Add(-(time.Hour * 24 * 30)) // days
+		err := d.db.Unscoped().Model(&models.Session{}).Where("created_at < ?", daysAgo).Delete(&models.Session{}).Error
+		if err != nil {
+			log.Println("Error deleting stale sessions: " + err.Error())
+		}
+	}
+
 }
