@@ -32,6 +32,7 @@ type WishlistItem struct {
 	Quantity           int
 	ReservedBy         string
 	ReservedByFullName string
+	Order              int
 }
 
 func (u *Wishlist) BeforeCreate(tx *gorm.DB) (err error) {

@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/00Duck/wishr-api/models"
+	"gorm.io/gorm"
 )
 
 func (d *DB) WishlistUpsert(wishlist *models.Wishlist) (string, error) {
@@ -19,7 +20,9 @@ func (d *DB) WishlistUpsert(wishlist *models.Wishlist) (string, error) {
 
 func (d *DB) WishlistRetrieveOne(session *models.Session, id string) (*models.Wishlist, error) {
 	wishlist := &models.Wishlist{}
-	res := d.db.Model(&models.Wishlist{}).Preload("Items").Find(wishlist, "id = ?", id)
+	res := d.db.Debug().Model(&models.Wishlist{}).Preload("Items", func(db *gorm.DB) *gorm.DB {
+		return db.Order("wishlist_items.order ASC")
+	}).Find(wishlist, "id = ?", id)
 	if res.RowsAffected == 0 {
 		return nil, errors.New("No record found")
 	}
