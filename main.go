@@ -22,7 +22,7 @@ func main() {
 	env := app.New()
 
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:80", "https://localhost:443", "https://localhost:8080", "http://localhost:8080"},
+		AllowedOrigins:   []string{"http://localhost:80", "https://localhost:443", "http://localhost:8080", "https://localhost:3443"},
 		AllowCredentials: true,
 	})
 

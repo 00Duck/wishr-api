@@ -5,5 +5,6 @@ DB_DATABASE="wishr" \
 DB_HOST="localhost" \
 DB_PORT="3306" \
 REGISTRATION_ENABLED="TRUE" \
+USE_SECURE_COOKIE="FALSE" \
 REGISTRATION_CODE="register-test"; \
 go build && ./wishr-api

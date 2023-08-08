@@ -23,12 +23,16 @@ func (env *Env) HandleLoginUser() http.HandlerFunc {
 			env.encodeResponse(w, &ResponseModel{Message: err.Error()})
 			return
 		}
+		secureCookie := true
+		if strings.ToUpper(os.Getenv("USE_SECURE_COOKIE")) != "TRUE" {
+			secureCookie = false
+		}
 		sessionCookie := &http.Cookie{
 			Name:   auth.SessionCookieName,
 			Value:  session.ID,
 			MaxAge: 60 * 60 * 24 * 30, // days
 			// Expires:  time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
-			Secure:   true,
+			Secure:   secureCookie,
 			HttpOnly: true,
 			SameSite: http.SameSiteNoneMode,
 			Path:     "/",
