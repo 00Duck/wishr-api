@@ -34,7 +34,7 @@ func (env *Env) HandleLoginUser() http.HandlerFunc {
 			// Expires:  time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
 			Secure:   secureCookie,
 			HttpOnly: true,
-			SameSite: http.SameSiteNoneMode,
+			SameSite: http.SameSiteStrictMode,
 			Path:     "/",
 		}
 
