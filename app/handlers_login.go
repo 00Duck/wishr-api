@@ -123,7 +123,6 @@ func (env *Env) ValidateSessionMiddleware(next http.Handler) http.Handler {
 		r = r.WithContext(auth.NewContext(r.Context(), session))
 
 		next.ServeHTTP(w, r)
-		return
 	})
 }
 

@@ -44,7 +44,7 @@ func (d *DB) Connect() {
 		log.Fatal("Failed to connect to database: " + err.Error())
 	}
 	log.Println("Connected to database")
-	err = d.AutoMigrate(&models.User{}, &models.Wishlist{}, &models.WishlistItem{}, &models.Session{})
+	err = d.AutoMigrate(&models.User{}, &models.Wishlist{}, &models.WishlistItem{}, &models.Session{}, &models.Group{})
 	if err != nil {
 		log.Fatal("Failed to AutoMigrate database.")
 	}

@@ -15,6 +15,7 @@ type User struct {
 	Password         string
 	RegistrationCode string      `gorm:"-"` // Only used for registration
 	SharedWishlists  []*Wishlist `gorm:"many2many:wishlist_share;"`
+	Groups           []*Group    `gorm:"many2many:group_user;"`
 }
 
 type SearchUser struct {
