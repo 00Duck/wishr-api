@@ -1,6 +1,7 @@
 package app
 
 func (env *Env) routes() {
+
 	unprotected := env.Router.PathPrefix("/api/open").Subrouter()
 	unprotected.HandleFunc("/login", env.HandleLoginUser()).Methods("POST")
 	unprotected.HandleFunc("/logout", env.HandleLogOutUser()).Methods("POST")
@@ -28,5 +29,14 @@ func (env *Env) routes() {
 
 	protected.HandleFunc("/wishlist_item/reserve", env.HandleWishlistItemReserve()).Methods("POST")
 	protected.HandleFunc("/wishlist_item/unreserve", env.HandleWishlistItemUnreserve()).Methods("POST")
+
+	unprotected.HandleFunc("/images/{table}/{id}", env.HandleRetrieveImage()).Methods("GET")
+
+	// env.Router.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
+	// 	tpl, _ := route.GetPathTemplate()
+	// 	met, _ := route.GetMethods()
+	// 	fmt.Println(tpl, met)
+	// 	return nil
+	// })
 
 }

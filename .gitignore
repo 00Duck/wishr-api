@@ -19,3 +19,6 @@ wishr-api
 
 # Ignore personal environment vars
 .env
+
+# Ignore images folder
+images/

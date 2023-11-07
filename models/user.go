@@ -13,6 +13,7 @@ type User struct {
 	UserName         string `gorm:"uniqueIndex"`
 	FullName         string
 	Password         string
+	ImageURL         string
 	RegistrationCode string      `gorm:"-"` // Only used for registration
 	SharedWishlists  []*Wishlist `gorm:"many2many:wishlist_share;"`
 	Groups           []*Group    `gorm:"many2many:group_user;"`
@@ -28,6 +29,7 @@ type ProfileUser struct {
 	ID       string
 	UserName string
 	FullName string
+	ImageURL string
 }
 
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {

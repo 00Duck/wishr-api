@@ -32,6 +32,7 @@ type WishlistItem struct {
 	Quantity           int
 	ReservedBy         string
 	ReservedByFullName string
+	ImageURL           string
 	Order              int
 }
 
