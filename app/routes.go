@@ -31,6 +31,8 @@ func (env *Env) routes() {
 	protected.HandleFunc("/wishlist_item/unreserve", env.HandleWishlistItemUnreserve()).Methods("POST")
 
 	unprotected.HandleFunc("/images/{table}/{id}", env.HandleRetrieveImage()).Methods("GET")
+	protected.HandleFunc("/images/{table}/upload", env.HandleImageUpload()).Methods("POST")
+	protected.HandleFunc("/images/delete", env.HandleDeleteImage()).Methods("POST")
 
 	// env.Router.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
 	// 	tpl, _ := route.GetPathTemplate()

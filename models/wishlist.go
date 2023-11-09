@@ -1,6 +1,7 @@
 package models
 
 import (
+	"os"
 	"strings"
 	"time"
 
@@ -42,5 +43,16 @@ func (u *Wishlist) BeforeCreate(tx *gorm.DB) (err error) {
 		return err
 	}
 	u.ID = strings.Replace(uid.String(), "-", "", -1)
+	return nil
+}
+
+func (u *Wishlist) BeforeDelete(tx *gorm.DB) (err error) {
+	wlItems := []WishlistItem{}
+	tx.Model(&WishlistItem{}).Where("wishlist = ? AND image_url != ''", u.ID).Find(&wlItems)
+
+	for _, k := range wlItems {
+		imgPath := strings.ReplaceAll(k.ImageURL, "..", "")
+		os.Remove("." + imgPath)
+	}
 	return nil
 }
