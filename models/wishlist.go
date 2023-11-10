@@ -35,6 +35,7 @@ type WishlistItem struct {
 	ReservedByFullName string
 	ImageURL           string
 	Order              int
+	RowKey             string //used only on client side to ensure unique keys for new wishlist items
 }
 
 func (u *Wishlist) BeforeCreate(tx *gorm.DB) (err error) {
