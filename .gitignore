@@ -22,3 +22,6 @@ wishr-api
 
 # Ignore images folder
 images/
+
+# Ignore sockets 
+*.sock
