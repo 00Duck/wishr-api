@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/00Duck/wishr-api/app"
@@ -44,14 +45,20 @@ func main() {
 	}()
 
 	channel := make(chan os.Signal, 1)
-	signal.Notify(channel, os.Interrupt)
-	signal.Notify(channel, os.Kill)
+	signal.Notify(channel, os.Interrupt, syscall.SIGTERM)
 
-	// block until we receive a kill or interrupt
-	<-channel
+	//Listen for signals somewhere else and die gracefully
+	go func() {
+		<-channel
 
-	//when the signal is caught, gracefully shutdown the server
-	//Allows a timeout for processes to complete if any are in progress
-	_, cancel := context.WithTimeout(context.Background(), time.Second*30)
-	defer cancel()
+		//when the signal is caught, gracefully shutdown the server
+		//Allows a timeout for processes to complete if any are in progress
+		_, cancel := context.WithTimeout(context.Background(), time.Second*30)
+		defer cancel()
+		env.CLI.Exit()
+		os.Exit(1)
+	}()
+
+	//The CLI serves as the blocking interface
+	env.CLI.Start()
 }

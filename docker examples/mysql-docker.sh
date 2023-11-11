@@ -5,6 +5,6 @@ docker run -d -p 3306:3306 \
 -e MYSQL_PASSWORD=wishr \
 -e MYSQL_ROOT_PASSWORD="your super strong root pw" \
 --name wishr-db \
---network wishr-net \
+--network host \
 -v /srv/wishr/db:/var/lib/mysql \
 mysql:8.0.31
