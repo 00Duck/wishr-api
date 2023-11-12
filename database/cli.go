@@ -1,10 +1,15 @@
 package database
 
 import (
+	"errors"
 	"log"
+	"net/url"
+	"os"
+	"time"
 
 	"github.com/00Duck/wishr-api/auth"
 	"github.com/00Duck/wishr-api/models"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -12,23 +17,34 @@ import (
 	All functions are only intended to be used for the command line interface.
 */
 
-// PasswordResetCLI CLI ONLY FUNCTION!
-func (d *DB) PasswordResetCLI(userName string, password string) string {
-	user := &models.User{}
-	BADMSG := "There was a problem completing this request - please try again later."
+var cliGenErrMsg = "There was a problem completing this request - please try again later."
+
+func (d *DB) getUserForCLI(userName string, user *models.User) error {
 	res := d.db.Where(&models.User{UserName: userName}).First(&user)
 	if res.Error != nil && res.Error == gorm.ErrRecordNotFound {
-		return "Invalid user - please try again."
+		return errors.New("record not found")
 	}
 	if res.Error != nil {
-		log.Println("PasswordResetCLI error: " + res.Error.Error())
-		return BADMSG
+		return res.Error
+	}
+	return nil
+}
+
+// PasswordResetCLI CLI ONLY FUNCTION!
+func (d *DB) PasswordResetCLI(userName string, password string) string {
+	user := models.User{}
+	err := d.getUserForCLI(userName, &user)
+	if err != nil {
+		if err.Error() == "record not found" {
+			return "Invalid user - please try again."
+		}
+		return cliGenErrMsg
 	}
 
 	pw, err := auth.HashPassword(password)
 	if err != nil {
-		log.Println("PasswordResetCLI error: " + res.Error.Error())
-		return BADMSG
+		log.Println("PasswordResetCLI error: " + err.Error())
+		return cliGenErrMsg
 	}
 	user.Password = pw
 
@@ -37,15 +53,43 @@ func (d *DB) PasswordResetCLI(userName string, password string) string {
 	return "Password updated."
 }
 
+// GeneratePasswordResetRequest CLI ONLY FUNCTION!
+func (d *DB) GeneratePasswordResetRequest(userName string) string {
+	user := models.User{}
+	err := d.getUserForCLI(userName, &user)
+	if err != nil {
+		if err.Error() == "record not found" {
+			return "Invalid user - please try again."
+		}
+		return cliGenErrMsg
+	}
+
+	user.ResetToken = uuid.New().String()
+	user.ResetTokenExpiration = time.Now().Add(time.Hour * 24) // 1 day from now
+
+	d.db.Save(&user)
+	webHost := os.Getenv("HOST_NAME")
+	if webHost == "" {
+		webHost = "https://<host_name>/"
+	}
+	retURL, err := url.JoinPath(webHost, "/passwordreset/"+user.ResetToken)
+	if err != nil {
+		log.Println("GeneratePasswordResetRequest error: " + err.Error())
+		return cliGenErrMsg
+	}
+
+	return "Reset token generated. Instruct user to visit the following" +
+		" link to reset their password (expires 24h).\n\n" + retURL
+}
+
 // ListObjects CLI ONLY FUNCTION!
 func (d *DB) ListObjects(objectType string) string {
-	BADMSG := "There was a problem completing this request - please try again later."
 	switch objectType {
 	case "users":
 		users := []models.User{}
 		res := d.db.Find(&users)
 		if res.Error != nil {
-			return BADMSG
+			return cliGenErrMsg
 		}
 		message := ""
 		for _, k := range users {
@@ -56,7 +100,7 @@ func (d *DB) ListObjects(objectType string) string {
 		wishlists := []models.Wishlist{}
 		res := d.db.Find(&wishlists)
 		if res.Error != nil {
-			return BADMSG
+			return cliGenErrMsg
 		}
 		message := ""
 		for _, k := range wishlists {

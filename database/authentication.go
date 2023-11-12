@@ -3,6 +3,7 @@ package database
 import (
 	"errors"
 	"log"
+	"time"
 
 	"github.com/00Duck/wishr-api/auth"
 	"github.com/00Duck/wishr-api/models"
@@ -85,4 +86,25 @@ func (d *DB) CheckSession(sessionIDValue string) (*models.Session, error) {
 		return nil, res.Error
 	}
 	return session, nil
+}
+
+func (d *DB) ValidateAndResetUser(resetToken string, password string) error {
+	user := &models.User{}
+	today := time.Now()
+	res := d.db.Model(&models.User{}).First(&user, "reset_token = ? AND reset_token_expiration > ?", resetToken, today)
+	if res.RowsAffected == 0 {
+		return errors.New("Invalid or expired token")
+	}
+	if password != "" {
+		pw, err := auth.HashPassword(password)
+		if err != nil {
+			return err
+		}
+		user.Password = pw
+		//Password has been reset, clear token and expiration
+		user.ResetTokenExpiration = today
+		user.ResetToken = ""
+		d.db.Save(&user)
+	}
+	return nil
 }

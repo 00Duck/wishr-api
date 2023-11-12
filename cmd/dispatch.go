@@ -20,6 +20,12 @@ func (c *CLI) dispatch(args []string) (string, error) {
 		msg := c.db.PasswordResetCLI(args[1], args[2])
 
 		return msg, nil
+	case "gpwr":
+		if len(args) != 2 {
+			return "Command expects 2 arguments. Ex: gpwr <user>", nil
+		}
+		msg := c.db.GeneratePasswordResetRequest(args[1])
+		return msg, nil
 	case "ls":
 		if len(args) != 2 {
 			return "Command expects 2 arguments. Ex: ls users", nil

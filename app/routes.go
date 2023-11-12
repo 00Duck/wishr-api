@@ -7,6 +7,8 @@ func (env *Env) routes() {
 	unprotected.HandleFunc("/logout", env.HandleLogOutUser()).Methods("POST")
 	unprotected.HandleFunc("/register", env.HandleRegisterUser()).Methods("POST")
 
+	unprotected.HandleFunc("/passwordreset/{token}", env.HandleResetTokenValidationAndReset()).Methods("GET", "POST")
+
 	protected := env.Router.PathPrefix("/api/prot").Subrouter()
 	protected.Use(env.ValidateSessionMiddleware)
 	protected.HandleFunc("/validate", env.ValidationCheck()).Methods("GET")

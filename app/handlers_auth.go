@@ -9,6 +9,7 @@ import (
 
 	"github.com/00Duck/wishr-api/auth"
 	"github.com/00Duck/wishr-api/models"
+	"github.com/gorilla/mux"
 )
 
 // HandleLoginUser authenticates user
@@ -109,14 +110,14 @@ func (env *Env) ValidateSessionMiddleware(next http.Handler) http.Handler {
 		sessionCookie, err := r.Cookie(auth.SessionCookieName)
 		if err != nil {
 			env.Log.Println("Error retrieving cookie for validation: " + err.Error())
-			errResponse(w, env.Log, 401, errors.New("No cookie found"))
+			errResponse(w, env.Log, http.StatusUnauthorized, errors.New("No cookie found"))
 			return
 		}
 		session, err := env.db.CheckSession(sessionCookie.Value)
 		if err != nil {
 			env.Log.Println("Error on CheckSession: " + err.Error())
 			SendLogoutCookie(w)
-			errResponse(w, env.Log, 401, errors.New("You are not logged in"))
+			errResponse(w, env.Log, http.StatusUnauthorized, errors.New("You are not logged in"))
 			return
 		}
 		//add the session information to the request context
@@ -146,4 +147,30 @@ func SendLogoutCookie(w http.ResponseWriter) {
 		Path:     "/",
 	}
 	http.SetCookie(w, logoutCookie)
+}
+
+func (env *Env) HandleResetTokenValidationAndReset() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		params := mux.Vars(r)
+		token := params["token"]
+		pw := ""
+		if token == "" {
+			errResponse(w, env.Log, http.StatusBadRequest, errors.New("Missing reset password token"))
+			return
+		}
+		if r.Method == "POST" {
+			pwModel := models.PasswordResetModel{}
+			if ok := env.decodeRequest(w, r, &pwModel); !ok {
+				return
+			}
+			pw = pwModel.Password
+		}
+
+		err := env.db.ValidateAndResetUser(token, pw)
+		if err != nil {
+			errResponse(w, env.Log, http.StatusUnauthorized, err)
+			return
+		}
+		env.encodeResponse(w, &ResponseModel{Message: "Somehow I got here"})
+	}
 }
