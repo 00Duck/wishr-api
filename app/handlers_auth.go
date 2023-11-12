@@ -171,6 +171,6 @@ func (env *Env) HandleResetTokenValidationAndReset() http.HandlerFunc {
 			errResponse(w, env.Log, http.StatusUnauthorized, err)
 			return
 		}
-		env.encodeResponse(w, &ResponseModel{Message: "Somehow I got here"})
+		env.encodeResponse(w, &ResponseModel{Message: "success"})
 	}
 }
