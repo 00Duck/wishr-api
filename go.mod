@@ -7,6 +7,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/rs/cors v1.8.2
 	golang.org/x/crypto v0.14.0
+	gopkg.in/gographics/imagick.v2 v2.6.3
 	gorm.io/driver/mysql v1.4.3
 	gorm.io/gorm v1.24.0
 
