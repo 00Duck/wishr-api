@@ -63,9 +63,10 @@ func (d *DB) GeneratePasswordResetRequest(userName string) string {
 		}
 		return cliGenErrMsg
 	}
+	expiration := time.Now().Add(time.Hour * 24) // 1 day from now
 
 	user.ResetToken = uuid.New().String()
-	user.ResetTokenExpiration = time.Now().Add(time.Hour * 24) // 1 day from now
+	user.ResetTokenExpiration = &expiration
 
 	d.db.Save(&user)
 	webHost := os.Getenv("HOST_NAME")

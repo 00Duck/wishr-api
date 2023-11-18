@@ -20,7 +20,7 @@ type User struct {
 	SharedWishlists      []*Wishlist `gorm:"many2many:wishlist_share;"`
 	Groups               []*Group    `gorm:"many2many:group_user;"`
 	ResetToken           string
-	ResetTokenExpiration time.Time
+	ResetTokenExpiration *time.Time //set to pointer so it can be a null value - required for associated saves (m2m)
 }
 
 type SearchUser struct {

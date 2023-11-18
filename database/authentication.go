@@ -102,7 +102,7 @@ func (d *DB) ValidateAndResetUser(resetToken string, password string) error {
 		}
 		user.Password = pw
 		//Password has been reset, clear token and expiration
-		user.ResetTokenExpiration = today
+		user.ResetTokenExpiration = &today
 		user.ResetToken = ""
 		d.db.Save(&user)
 	}
