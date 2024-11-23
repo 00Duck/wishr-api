@@ -54,6 +54,17 @@ func (d *DB) WishlistRetrieveAll(session *models.Session) ([]models.Wishlist, er
 	return wishlists, res.Error
 }
 
+func (d *DB) WishlistBrowse(session *models.Session) ([]models.Wishlist, error) {
+	wishlists := []models.Wishlist{}
+	res := d.db.Order("Name asc").Where(&models.Wishlist{AccessMode: "public"}).Find(&wishlists)
+
+	for i := 0; i < len(wishlists); i++ {
+		wishlists[i].IsOwner = wishlists[i].Owner == session.UserID
+		wishlists[i].OwnerFullName = d.getUserFullName(wishlists[i].Owner)
+	}
+	return wishlists, res.Error
+}
+
 func (d *DB) WishlistDelete(id string) (string, error) {
 	res := d.db.Unscoped().Select("Items", "SharedWith").Delete(&models.Wishlist{ID: id})
 	if res.RowsAffected == 0 {

@@ -20,6 +20,7 @@ type Wishlist struct {
 	CreatedAt     time.Time `gorm:"<-:create"` // allow read and create
 	SharedWith    []*User   `gorm:"many2many:wishlist_share;"`
 	IsOwner       bool      `gorm:"-"` //handled in app layer
+	AccessMode    string    //values: public, private
 }
 
 type WishlistItem struct {

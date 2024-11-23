@@ -41,6 +41,19 @@ func (env *Env) HandleWishlistRetrieveAll() http.HandlerFunc {
 	}
 }
 
+// Retrieves all public wish lists
+func (env *Env) HandleWishlistBrowse() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		session := auth.FromContext(r.Context())
+		wishlists, err := env.db.WishlistBrowse(session)
+		if err != nil {
+			env.encodeResponse(w, &ResponseModel{Message: "Error: " + err.Error(), Data: nil})
+			return
+		}
+		env.encodeResponse(w, &ResponseModel{Message: "success", Data: wishlists})
+	}
+}
+
 // Retrieves all shared wishlists for the given session user
 func (env *Env) HandleWishlistRetrieveShared() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
