@@ -1,7 +1,7 @@
 FROM golang:1.20
 
 # Ignore APT warnings about not having a TTY
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 
 # install build essentials
 RUN apt-get update && \
@@ -11,10 +11,10 @@ RUN apt-get update && \
 RUN apt-get -q -y install libjpeg-dev libpng-dev libtiff-dev \
     libgif-dev libx11-dev libheif-dev --no-install-recommends
 
-ENV IMAGEMAGICK_VERSION=6.9.11-60
+ENV IMAGEMAGICK_VERSION=7.1.1-39
 
 RUN cd && \
-	wget https://github.com/ImageMagick/ImageMagick6/archive/${IMAGEMAGICK_VERSION}.tar.gz && \
+	wget https://github.com/ImageMagick/ImageMagick/archive/${IMAGEMAGICK_VERSION}.tar.gz && \
 	tar xvzf ${IMAGEMAGICK_VERSION}.tar.gz && \
 	cd ImageMagick* && \
 	./configure \

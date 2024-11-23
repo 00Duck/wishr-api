@@ -55,7 +55,7 @@ func (d *DB) WishlistRetrieveAll(session *models.Session) ([]models.Wishlist, er
 }
 
 func (d *DB) WishlistDelete(id string) (string, error) {
-	res := d.db.Unscoped().Select("Items").Delete(&models.Wishlist{ID: id})
+	res := d.db.Unscoped().Select("Items", "SharedWith").Delete(&models.Wishlist{ID: id})
 	if res.RowsAffected == 0 {
 		return "", errors.New("No record found to delete")
 	}
