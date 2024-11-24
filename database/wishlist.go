@@ -31,6 +31,9 @@ func (d *DB) WishlistRetrieveOne(session *models.Session, id string) (*models.Wi
 	if wishlist.IsOwner {
 		return wishlist, res.Error
 	}
+	if wishlist.AccessMode == "public" {
+		return wishlist, res.Error
+	}
 	//If the list is no longer shared with this user, don't return it
 	sharedUsers := []models.User{}
 	err := d.db.Model(&models.Wishlist{ID: id}).Association("SharedWith").Find(&sharedUsers, &models.User{ID: session.UserID})
